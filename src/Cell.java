@@ -1,4 +1,3 @@
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
@@ -95,7 +94,9 @@ public class Cell extends Button {
     public void reveal() {
         setRevealed(true);
         doGraphic();
-        Main.isDead = true;
+
+
+        Main.getFace().setDead();
 
 
     }

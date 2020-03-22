@@ -11,9 +11,9 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-import java.io.IOException;
-
 public class Main extends Application {
+
+    private static Face face = null;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -50,7 +50,7 @@ public class Main extends Application {
         Text playerTimer = new Text("Player Timer");
         myHeader.getChildren().add(playerTimer);
 
-        Face face = new Face();
+        face = new Face();
 
         myHeader.getChildren().add(face);
 
@@ -68,6 +68,10 @@ public class Main extends Application {
         //theBoard.addMinesFixed();
         theBoard.solveProximityCount();
         return theBoard.returnGridPane();
+    }
+
+    public static Face getFace() {
+        return face;
     }
 
 }
