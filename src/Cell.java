@@ -1,7 +1,6 @@
-import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.input.MouseButton;
 
 public class Cell extends Button {
     boolean revealed;
@@ -10,21 +9,44 @@ public class Cell extends Button {
     int proximityCount = 0;
     int row;
     int col;
+    Board theBoard;
+    Face face;
 
-    public Cell(boolean revealed, boolean mined, boolean flagged, int col, int row) {
+    public Cell(boolean revealed, boolean mined, boolean flagged, int col, int row, Board theBoard, Face face) {
         this.revealed = revealed;
         this.mined = mined;
         this.flagged = flagged;
         this.col = col;
         this.row = row;
+        this.theBoard = theBoard;
+        this.face = face;
+
 
         doGraphic();
 
-        setOnMouseClicked(new EventHandler<MouseEvent>() {
-            public void handle(MouseEvent e) {
-                handleClick();
-            }
+        setOnMousePressed(e -> {
+            if (e.isPrimaryButtonDown())
+                ;//face.setO();
         });
+        setOnMouseReleased(e -> {
+            ;//face.setSmile();
+        });
+
+        setOnMouseClicked(e -> {
+            MouseButton mouseButton = e.getButton();
+            if (mouseButton == MouseButton.PRIMARY)
+                handleLeftClick();
+            else if (mouseButton == MouseButton.SECONDARY)
+                handleRightClick();
+        });
+
+        //print DEBUG STUFF related to padding
+        //System.out.println("this.getPadding() returns: " + this.getPadding());
+        System.out.println("getWidth() returns: " + getWidth());
+
+        //Joe's working code below
+        //setMaxSize(32, 32);
+        //setMinSize(32, 32);
     }
 
     public boolean isRevealed() {
@@ -49,6 +71,17 @@ public class Cell extends Button {
 
     public void setFlagged(boolean flagged) {
         this.flagged = flagged;
+    }
+
+    public void toggleFlag() {
+        if (isFlagged()) {
+            setFlagged(false);
+            theBoard.decrementFlagCount();
+        }
+        else {
+            setFlagged(true);
+            theBoard.incrementFlagCount();
+        }
     }
 
     public int getProximityCount() {
@@ -84,33 +117,46 @@ public class Cell extends Button {
             else
                 this.setGraphic(new ImageView("file:res/cover.png"));
         }
+        System.out.println("AFTER doing graphic, getWidth() returns: " + getWidth());
+        System.out.println("AFTER doing graphic, getPadding() returns: " + getPadding());
     }
 
-    public void handleClick() {
-        if (!revealed)
-            reveal();
+    public void handleLeftClick() {
+        if (!theBoard.isGameOver()) {
+            if (theBoard.isVirginBoard()) {
+                theBoard.addMines(theBoard.getMines(), col, row);
+                theBoard.solveProximityCount();
+                theBoard.setVirginBoard(false);
+            }
+            if (!isFlagged()) {
+                if (!revealed)
+                    reveal();
+                else
+                    theBoard.revealAdjacentCells(col, row);
+            }
+        }
+        if (theBoard.onlyMinesLeft())
+            face.setWin();
+    }
+
+    public void handleRightClick() {
+        if (!theBoard.isGameOver()) {
+            if (!revealed)
+                toggleFlag();
+            doGraphic();
+        }
     }
 
     public void reveal() {
         setRevealed(true);
         doGraphic();
 
+        if (isMined())
+            //theBoard.gameOver();
+            face.setDead();
 
-        Main.getFace().setDead();
-
+        if (proximityCount == 0)
+            theBoard.revealAdjacentCells(col, row);
 
     }
-    /* public void revealAdjacentCells(int col, int row) {
-        for (int subRow = row - 1; subRow < row + 2; subRow++) {
-            for (int subCol = col - 1; subCol < col + 2; subCol++) {
-                if (subRow > -1 && subRow < rows && subCol > -1 && subCol < cols && !cells[subCol][subRow].isRevealed()) {
-                    cells[subCol][subRow].reveal();
-                }
-            }
-        }
-    }
-
-     */
-
-
 }

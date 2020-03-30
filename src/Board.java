@@ -2,21 +2,46 @@ import javafx.scene.layout.GridPane;
 
 import java.util.ArrayList;
 
-public class Board {
-    int rows;
-    int cols;
-    Cell[][] cells;
+import static javafx.scene.layout.GridPane.getMargin;
 
-    public Board(int rows, int cols) {
+public class Board {
+    private int rows;
+    private int cols;
+    private int mines;
+    private Cell[][] cells;
+    private int flagCount = 0;
+    Face face;
+    private boolean virginBoard = true;
+    private boolean gameOver = false;
+
+    public Board(int cols, int rows, int mines, Face face) {
         this.rows = rows;
         this.cols = cols;
+        this.mines = mines;
         cells = new Cell[cols][rows];
+        this.face = face;
 
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
-                cells[col][row] = new Cell(false, false, false, col, row);
+                cells[col][row] = new Cell(false, false, false, col, row, this, face);
             }
         }
+    }
+
+    public boolean isVirginBoard() {
+        return virginBoard;
+    }
+    public void setVirginBoard(boolean b) {
+        virginBoard = b;
+    }
+    public boolean isGameOver() {
+        return gameOver;
+    }
+    public void setGameOver(boolean b) {
+        gameOver = b;
+    }
+    public int getMines() {
+        return mines;
     }
 
     public GridPane returnGridPane() {
@@ -78,5 +103,46 @@ public class Board {
         }
     }
 
+    public void gameOver() {
+        setGameOver(true);
+        System.out.println("GAME OVER");
+        System.out.println("rows =" + rows);
+        System.out.println("cols =" + cols);
+        for (int row = 0; row < rows; rows++) {
+            for (int col = 0; col < cols; cols++) {
+                if (!cells[col][row].isRevealed())
+                  cells[col][row].reveal();
+            }
+        }
+    }
 
+    public int getFlagCount() {
+        return flagCount;
+    }
+    public void decrementFlagCount() {
+        flagCount--;
+    }
+    public void incrementFlagCount() {
+        flagCount++;
+    }
+
+    public void revealAdjacentCells(int col, int row) {
+        for (int subRow = row - 1; subRow < row + 2; subRow++) {
+            for (int subCol = col - 1; subCol < col + 2; subCol++) {
+                if (subRow > -1 && subRow < rows && subCol > -1 && subCol < cols && !cells[subCol][subRow].isRevealed() && !cells[subCol][subRow].isFlagged()) {
+                    cells[subCol][subRow].reveal();
+                }
+            }
+        }
+    }
+    public boolean onlyMinesLeft() {
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+                Cell theCell = cells[row][col];
+                if (!theCell.isRevealed() && !theCell.isMined())
+                    return false;
+            }
+        }
+        return true;
+    }
 }

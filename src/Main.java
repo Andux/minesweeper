@@ -13,8 +13,18 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 
-    private static Face face = null;
+    private static Face face = new Face();
+   //private static Face face = null;
+    /*
+        private static Board theBoard;
 
+        public static Face getFace() {
+            return face;
+        }
+        public static Board getTheBoard() {
+            return theBoard;
+        }
+    */
     @Override
     public void start(Stage primaryStage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
@@ -31,7 +41,7 @@ public class Main extends Application {
     public static Scene myStartUp() {
         BorderPane myRootPane = new BorderPane();
         myRootPane.setTop(drawHeader());
-        myRootPane.setCenter(drawArenaV2(0));
+        myRootPane.setCenter(drawArenaV2(10, 10, 20));
         Scene myScene = new Scene(myRootPane);
 
         return myScene;
@@ -50,7 +60,6 @@ public class Main extends Application {
         Text playerTimer = new Text("Player Timer");
         myHeader.getChildren().add(playerTimer);
 
-        face = new Face();
 
         myHeader.getChildren().add(face);
 
@@ -62,16 +71,15 @@ public class Main extends Application {
         return myHeader;
     }
 
-    public static GridPane drawArenaV2(int mineCount) {
-        Board theBoard = new Board(10, 10);
-        theBoard.addMines(91, 1, 1);
+    public static GridPane drawArenaV2(int cols, int rows, int mines) {
+        Board theBoard = new Board(cols, rows, mines, face);
+        //theBoard.addMines(30, 1, 1);
         //theBoard.addMinesFixed();
-        theBoard.solveProximityCount();
+        //theBoard.solveProximityCount();
         return theBoard.returnGridPane();
     }
 
-    public static Face getFace() {
-        return face;
-    }
+
+
 
 }
